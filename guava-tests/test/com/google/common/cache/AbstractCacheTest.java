@@ -113,6 +113,55 @@ public class AbstractCacheTest extends TestCase {
     assertEquals(0, stats.evictionCount());
   }
 
+  
+ public void positiveRecordHitsTest() {
+    //this is a positive test case of the recordHits method.
+	StatsCounter counter = new SimpleStatsCounter();
+    for (int i = 0; i < 15; i++) {
+      counter.recordHits(1); //this iteration happens 15 times. So the value on hitCount should be 15 at the end of the test.
+	  //this method records cache hits. This should be called when a cache request returns a cached value. 
+    }
+	//The iterations below exists to avoid nullPointerException
+	for (int i = 0; i < 2; i++) {
+      counter.recordLoadSuccess(i);
+    }
+    for (int i = 0; i < 2; i++) {
+      counter.recordLoadException(i);
+    }
+    for (int i = 0; i < 2; i++) {
+      counter.recordMisses(1);
+    }
+    for (int i = 0; i < 2; i++) {
+      counter.recordEviction();
+    }
+    CacheStats stats = counter.snapshot();
+    assertEquals(15, stats.hitCount());  //hitcount must return 15 due to the first iteration
+  }
+  
+  public void negativeRecordHitsTest() {
+    //this is a negative test case of the recordHits method.
+	StatsCounter counter = new SimpleStatsCounter();
+    for (int i = 0; i < 14; i++) {
+      counter.recordHits(1); //this iteration happens 14 times. So the value on hitCount should be 15 at the end of the test.
+	  //this method records cache hits. This should be called when a cache request returns a cached value. 
+    }
+	//The iterations below exists to avoid nullPointerException
+	for (int i = 0; i < 2; i++) {
+      counter.recordLoadSuccess(i);
+    }
+    for (int i = 0; i < 2; i++) {
+      counter.recordLoadException(i);
+    }
+    for (int i = 0; i < 2; i++) {
+      counter.recordMisses(1);
+    }
+    for (int i = 0; i < 2; i++) {
+      counter.recordEviction();
+    }
+    CacheStats stats = counter.snapshot();
+    assertFalse(stats.hitCount() == 15);  //hitcount must not return 15 due to the first iteration. The iteration happens 14 times!
+  }
+  
   public void testSingleSimpleStats() {
     StatsCounter counter = new SimpleStatsCounter();
     for (int i = 0; i < 11; i++) {
